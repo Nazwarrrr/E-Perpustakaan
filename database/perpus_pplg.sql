@@ -1,3 +1,10 @@
+CREATE TABLE riwayat (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_user INT,
+    id_buku INT,
+    aksi VARCHAR(20),
+    tanggal DATETIME
+);
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50),
