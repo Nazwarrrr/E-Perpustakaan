@@ -34,7 +34,9 @@ if (isset($_POST['login'])) {
     <title>Login</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body style="background: #ffffffff;">
+<body>
+<!-- floating emoji books (visual-only, behind the form) -->
+<div id="floating-books-root" aria-hidden="true"></div>
 <div class="login-container login-animate">
     <div style="text-align:center;margin-bottom:18px;">
         <img src="assets/img/logo.png" alt="Logo" class="login-logo-img" style="width: 120px;height:120px;object-fit:contain;">
@@ -56,6 +58,51 @@ setTimeout(() => {
   document.querySelector('.login-container').style.transition = 'opacity 0.8s';
   document.querySelector('.login-container').style.opacity = 1;
 }, 200);
+</script>
+<script>
+// Generate many floating book emojis for visual background (non-interactive)
+(function(){
+    const root = document.getElementById('floating-books-root');
+    if(!root) return;
+    const emojis = ['📚','📖','📘','📕','📗'];
+    const count = 20; // number of floating emojis
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    for (let i=0;i<count;i++){
+        const el = document.createElement('div');
+        el.className = 'floating-book';
+        // choose emoji
+        el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        // random size
+        const size = 18 + Math.floor(Math.random()*36); // 18..54px
+        el.style.fontSize = size + 'px';
+        // random horizontal start position
+        const left = Math.random() * (vw - 40);
+        el.style.left = left + 'px';
+        // random animation duration & delay
+        const dur = 10 + Math.random()*16; // 10..26s
+        const delay = Math.random()*6; // 0..6s
+        // set CSS variable for horizontal drift and inline animation to ensure it runs
+        const drift = (Math.random()*160) - 80; // -80..80px for horizontal movement
+        el.style.setProperty('--drift', drift + 'px');
+        // ensure element is fixed and positioned at bottom start
+        el.style.position = 'fixed';
+        el.style.bottom = '-80px';
+        // include animation name so it actually animates
+        el.style.animation = `floatUp ${dur}s cubic-bezier(.2,.9,.2,1) ${-Math.random()*dur}s infinite`;
+        // slight horizontal drift using transform translateX
+        // ensure behind form
+        el.style.zIndex = 0;
+        root.appendChild(el);
+    }
+    // Reposition on resize
+    window.addEventListener('resize', ()=>{
+        const newVw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+        root.querySelectorAll('.floating-book').forEach((el)=>{
+            const left = Math.random() * (newVw - 40);
+            el.style.left = left + 'px';
+        });
+    });
+})();
 </script>
 </body>
 </html>

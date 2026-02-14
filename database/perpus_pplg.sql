@@ -30,3 +30,16 @@ INSERT INTO buku (judul, penulis, penerbit, stok, rak, status) VALUES
 ('Laskar Pelangi', 'Andrea Hirata', 'Bentang', 3, 'A1', 'Tersedia'),
 ('Bumi', 'Tere Liye', 'Gramedia', 1, 'B2', 'Tersedia'),
 ('Negeri 5 Menara', 'Ahmad Fuadi', 'Gramedia', 0, 'C3', 'Dipinjam');
+
+-- Table for peminjaman dengan data peminjam (nama, kelas, tanggal pinjam/kembali)
+CREATE TABLE peminjaman (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_user INT,
+    id_buku INT,
+    nama_peminjam VARCHAR(150),
+    kelas VARCHAR(100),
+    tanggal_pinjam DATE,
+    tanggal_kembali DATE,
+    status VARCHAR(30),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);

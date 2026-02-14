@@ -43,6 +43,15 @@ $status = 'Aktif';
             <div class="profile-progress-bar" style="width:<?= min(100, $kunjungan*5); ?>%"></div>
         </div>
     </div>
+    <?php
+    // show active borrowings count from peminjaman
+    include 'config/koneksi.php';
+    $id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : 0;
+    $q = mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM peminjaman WHERE id_user='$id_user' AND status<>'Kembali'");
+    $c = mysqli_fetch_assoc($q);
+    $active_borrow = $c ? intval($c['cnt']) : 0;
+    ?>
+    <div style="margin-top:8px;">Peminjaman Aktif: <strong><?= $active_borrow; ?></strong> <a href="user_peminjaman.php">Lihat</a></div>
     <div class="profile-history">
         <h3 style="color:#3498db;margin-top:24px;">Riwayat Pinjam/Kembalikan</h3>
         <ul style="text-align:left;max-width:320px;margin:0 auto;">

@@ -49,14 +49,19 @@ if ($params) {
 
 <div class="top-bar">
     <a href="profil.php" class="top-profile">Profil</a>
+    <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>
+        <a href="admin_peminjaman.php" class="top-profile" style="margin-left:12px;">Peminjaman</a>
+    <?php endif; ?>
 </div>
 <div style="text-align:center;margin-bottom:8px;">
     <img src="assets/img/logo.png" alt="Logo" class="list-logo-img" style="width:90px;height:90px;object-fit:contain;">
 </div>
 <h2 style="text-align:center;">Daftar Buku Perpustakaan</h2>
+<?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>
 <div class="add-book-fixed">
     <a href="tambah_buku.php" title="Tambah Buku">+</a>
 </div>
+<?php endif; ?>
 
 
 <form method="get" class="book-filter-form">
@@ -75,7 +80,7 @@ if ($params) {
 <div class="book-list">
 <?php
 $no = 1;
-$perPage = 6;
+$perPage = 3;
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $books = [];
 while ($data = isset($result) && $result ? mysqli_fetch_assoc($result) : mysqli_fetch_assoc($query)) {
@@ -89,7 +94,7 @@ foreach ($booksPage as $data) : ?>
     <div class="book-card">
         <div class="book-title">#<?= $no++; ?> - <?= $data['judul']; ?></div>
         <div class="book-img">
-            <img src="upload/<?= $data['foto']; ?>" alt="<?= $data['judul']; ?>" width="100">
+            <img src="upload/<?= $data['foto']; ?>" alt="<?= $data['judul']; ?>" width="140">
         </div>
         <div class="book-info">
             <div><span class="book-label">Penulis:</span> <?= $data['penulis']; ?></div>
@@ -121,5 +126,6 @@ foreach ($booksPage as $data) : ?>
     <?php endfor; ?>
 </div>
 
+<script src="assets/js/ui.js"></script>
 </body>
 </html>
