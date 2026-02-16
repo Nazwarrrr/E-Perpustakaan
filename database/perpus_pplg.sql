@@ -43,3 +43,11 @@ CREATE TABLE peminjaman (
     status VARCHAR(30),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Tambahan: kolom baru untuk tabel `buku`
+-- Jika Anda menjalankan dump ini pada database yang sudah ada, pastikan untuk menyesuaikan
+-- (ALTER TABLE akan menambahkan kolom `deskripsi`, `jumlah_halaman`, dan `tahun_terbit` jika belum ada)
+ALTER TABLE `buku`
+    ADD COLUMN IF NOT EXISTS `deskripsi` TEXT NULL AFTER `foto`,
+    ADD COLUMN IF NOT EXISTS `jumlah_halaman` INT NULL AFTER `deskripsi`,
+    ADD COLUMN IF NOT EXISTS `tahun_terbit` YEAR NULL AFTER `penerbit`;

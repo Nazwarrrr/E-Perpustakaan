@@ -74,22 +74,37 @@ $book = $qbook ? mysqli_fetch_assoc($qbook) : null;
     <?php endif; ?>
 
     <?php if (!$book && $_SERVER['REQUEST_METHOD'] !== 'POST'): ?>
-        <div style="padding:18px;background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">Buku tidak ditemukan atau ID peminjaman kosong. Kembali ke daftar buku.</div>
+        <div class="form-empty">Buku tidak ditemukan atau ID peminjaman kosong. Kembali ke daftar buku.</div>
         <div style="margin-top:12px;"><a href="test_buku.php" class="book-back">Kembali</a></div>
     <?php else: ?>
-    <form method="post">
+    <form method="post" class="peminjaman-form">
         <input type="hidden" name="id_buku" value="<?= $id; ?>">
-        <label>Nama</label>
-        <input type="text" name="nama_peminjam" required value="<?= isset($_SESSION['nama']) ? htmlspecialchars($_SESSION['nama']) : '' ?>">
-        <label>Kelas</label>
-        <input type="text" name="kelas" required placeholder="contoh: X IPA 1">
-        <label>Tanggal Pinjam</label>
-        <input type="date" name="tanggal_pinjam" required value="<?= date('Y-m-d'); ?>">
-        <label>Tanggal Kembali</label>
-        <input type="date" name="tanggal_kembali" required>
-        <button type="submit">Konfirmasi Pinjam</button>
+
+        <div class="form-group">
+            <label>Nama</label>
+            <input type="text" name="nama_peminjam" required value="<?= isset($_SESSION['nama']) ? htmlspecialchars($_SESSION['nama']) : '' ?>">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Kelas</label>
+                <input type="text" name="kelas" required placeholder="contoh: X IPA 1">
+            </div>
+            <div class="form-group">
+                <label>Tanggal Pinjam</label>
+                <input type="date" name="tanggal_pinjam" required value="<?= date('Y-m-d'); ?>">
+            </div>
+            <div class="form-group">
+                <label>Tanggal Kembali</label>
+                <input type="date" name="tanggal_kembali" required>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-confirm">Konfirmasi Pinjam</button>
+            <a href="test_buku.php" class="book-back" style="margin-left:12px;">Batal</a>
+        </div>
     </form>
-    <div style="margin-top:12px;"><a href="test_buku.php" class="book-back">Batal</a></div>
     <?php endif; ?>
 </div>
 </body>

@@ -43,6 +43,9 @@ $status = 'Aktif';
             <div class="profile-progress-bar" style="width:<?= min(100, $kunjungan*5); ?>%"></div>
         </div>
     </div>
+    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+        <div style="margin-top:10px;"><a href="admin_dashboard.php" class="btn-kembali">Dashboard Admin</a></div>
+    <?php endif; ?>
     <?php
     // show active borrowings count from peminjaman
     include 'config/koneksi.php';

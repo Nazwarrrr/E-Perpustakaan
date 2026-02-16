@@ -22,18 +22,7 @@ if (!empty($_GET['status'])) {
     $types .= 's';
 }
 // Filter penulis dihapus
-$sql = "SELECT * FROM buku";
-if ($where) {
-    $sql .= " WHERE " . implode(' AND ', $where);
-}
-if ($params) {
-    $query = mysqli_prepare($koneksi, $sql);
-    mysqli_stmt_bind_param($query, $types, ...$params);
-    mysqli_stmt_execute($query);
-    $result = mysqli_stmt_get_result($query);
-} else {
-    $result = mysqli_query($koneksi, $sql);
-}
+// (Query untuk data per-halaman akan dieksekusi lebih bawah menggunakan LIMIT/OFFSET)
 ?>
 
 <!DOCTYPE html>
@@ -50,13 +39,20 @@ if ($params) {
 <div class="top-bar">
     <a href="profil.php" class="top-profile">Profil</a>
     <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>
+        <a href="admin_dashboard.php" class="top-profile" style="margin-left:12px;">Dashboard</a>
         <a href="admin_peminjaman.php" class="top-profile" style="margin-left:12px;">Peminjaman</a>
     <?php endif; ?>
 </div>
 <div style="text-align:center;margin-bottom:8px;">
     <img src="assets/img/logo.png" alt="Logo" class="list-logo-img" style="width:90px;height:90px;object-fit:contain;">
 </div>
+<div class="page-center">
 <h2 style="text-align:center;">Daftar Buku Perpustakaan</h2>
+<?php if (!empty($_SESSION['flash'])): ?>
+    <div style="max-width:900px;margin:12px auto;background:#e6ffed;border:1px solid #b8f3c7;padding:10px;border-radius:6px;color:#05683a;text-align:center;">
+        <?= htmlspecialchars($_SESSION['flash']); unset($_SESSION['flash']); ?>
+    </div>
+<?php endif; ?>
 <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>
 <div class="add-book-fixed">
     <a href="tambah_buku.php" title="Tambah Buku">+</a>
@@ -80,21 +76,62 @@ if ($params) {
 <div class="book-list">
 <?php
 $no = 1;
-$perPage = 3;
+$perPage = 9; // maksimal buku per halaman
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-$books = [];
-while ($data = isset($result) && $result ? mysqli_fetch_assoc($result) : mysqli_fetch_assoc($query)) {
-    $books[] = $data;
+
+// Siapkan bagian WHERE (sudah dibangun di atas sebagai $where, $params, $types)
+$whereSql = '';
+if ($where) {
+    $whereSql = ' WHERE ' . implode(' AND ', $where);
 }
-$totalBooks = count($books);
-$totalPages = ceil($totalBooks / $perPage);
+
+// 1) Hitung total data (tanpa LIMIT)
+$countSql = "SELECT COUNT(*) AS total FROM buku" . $whereSql;
+if ($params) {
+    $stmtCount = mysqli_prepare($koneksi, $countSql);
+    if ($stmtCount === false) {
+        die('Prepare failed: ' . mysqli_error($koneksi));
+    }
+    mysqli_stmt_bind_param($stmtCount, $types, ...$params);
+    mysqli_stmt_execute($stmtCount);
+    $resCount = mysqli_stmt_get_result($stmtCount);
+    $rowCount = mysqli_fetch_assoc($resCount);
+    mysqli_stmt_close($stmtCount);
+} else {
+    $resCount = mysqli_query($koneksi, $countSql);
+    $rowCount = mysqli_fetch_assoc($resCount);
+}
+$totalBooks = (int) ($rowCount['total'] ?? 0);
+$totalPages = $totalBooks > 0 ? (int) ceil($totalBooks / $perPage) : 1;
+
+// Pastikan halaman dalam rentang
+if ($page > $totalPages) $page = $totalPages;
+
+// 2) Hitung offset
 $start = ($page - 1) * $perPage;
-$booksPage = array_slice($books, $start, $perPage);
-foreach ($booksPage as $data) : ?>
+if ($start < 0) $start = 0;
+
+// 3) Ambil data untuk halaman ini menggunakan LIMIT dan OFFSET
+$dataSql = "SELECT * FROM buku" . $whereSql . " ORDER BY id_buku DESC LIMIT " . intval($start) . ", " . intval($perPage);
+if ($params) {
+    $stmt = mysqli_prepare($koneksi, $dataSql);
+    if ($stmt === false) {
+        die('Prepare failed: ' . mysqli_error($koneksi));
+    }
+    // Bind hanya parameter filter (LIMIT sudah di-interpolate sebagai integer aman)
+    mysqli_stmt_bind_param($stmt, $types, ...$params);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+    mysqli_stmt_close($stmt);
+} else {
+    $res = mysqli_query($koneksi, $dataSql);
+}
+
+while ($data = mysqli_fetch_assoc($res)) : ?>
     <div class="book-card">
-        <div class="book-title">#<?= $no++; ?> - <?= $data['judul']; ?></div>
+        <div class="book-title">#<?= $no++; ?> - <a href="detail_buku.php?id=<?= $data['id_buku']; ?>"><?= htmlspecialchars($data['judul']); ?></a></div>
         <div class="book-img">
-            <img src="upload/<?= $data['foto']; ?>" alt="<?= $data['judul']; ?>" width="140">
+            <a href="detail_buku.php?id=<?= $data['id_buku']; ?>"><img src="upload/<?= htmlspecialchars($data['foto']); ?>" alt="<?= htmlspecialchars($data['judul']); ?>" width="140"></a>
         </div>
         <div class="book-info">
             <div><span class="book-label">Penulis:</span> <?= $data['penulis']; ?></div>
@@ -106,18 +143,18 @@ foreach ($booksPage as $data) : ?>
             <div><span class="book-label">Rak:</span> <?= $data['rak']; ?></div>
             <div class="book-action">
                 <?php if ($data['status'] == 'Tersedia' && $data['stok'] > 0) { ?>
-                    <a href="pinjam.php?id=<?= $data['id_buku']; ?>">Pinjam</a>
-                <?php } elseif ($data['status'] == 'Dipinjam' || ($data['status'] == 'Habis' && $data['stok'] == 0)) { ?>
-                    <a href="kembalikan.php?id=<?= $data['id_buku']; ?>">Kembalikan</a>
+                    <a class="action-btn primary" href="pinjam.php?id=<?= $data['id_buku']; ?>">Pinjam</a>
+                <?php } else { ?>
+                    <a class="action-btn disabled">Pinjam</a>
                 <?php } ?>
+                <a class="action-btn ghost" href="detail_buku.php?id=<?= $data['id_buku']; ?>">Detail</a>
                 <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin') { ?>
-                    <a href="edit_buku.php?id=<?= $data['id_buku']; ?>" class="book-edit">Edit</a>
-                    <a href="hapus_buku.php?id=<?= $data['id_buku']; ?>" class="book-delete" onclick="return confirm('Yakin hapus buku ini?')">Hapus</a>
+                    <a href="edit_buku.php?id=<?= $data['id_buku']; ?>" class="action-btn ghost">Edit</a>
                 <?php } ?>
             </div>
         </div>
     </div>
-<?php endforeach; ?>
+<?php endwhile; ?>
 </div>
 
 <div class="pagination">
@@ -127,5 +164,11 @@ foreach ($booksPage as $data) : ?>
 </div>
 
 <script src="assets/js/ui.js"></script>
+<script>
+    // Beri tahu script client apakah user adalah admin (digunakan oleh live_books.js)
+    window.IS_ADMIN = <?= (isset($_SESSION['role']) && $_SESSION['role'] == 'admin') ? 'true' : 'false' ?>;
+</script>
+<script src="assets/js/live_books.js"></script>
+</div>
 </body>
 </html>
