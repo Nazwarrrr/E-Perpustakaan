@@ -43,11 +43,11 @@ if (!empty($_GET['status'])) {
         <a href="admin_peminjaman.php" class="top-profile" style="margin-left:12px;">Peminjaman</a>
     <?php endif; ?>
 </div>
-<div style="text-align:center;margin-bottom:8px;">
+<div class="page-center">
+<div style="text-align:center;margin-bottom:12px;">
     <img src="assets/img/logo.png" alt="Logo" class="list-logo-img" style="width:90px;height:90px;object-fit:contain;">
 </div>
-<div class="page-center">
-<h2 style="text-align:center;">Daftar Buku Perpustakaan</h2>
+<h2 style="text-align:center;margin-bottom:16px;">Daftar Buku Perpustakaan</h2>
 <?php if (!empty($_SESSION['flash'])): ?>
     <div style="max-width:900px;margin:12px auto;background:#e6ffed;border:1px solid #b8f3c7;padding:10px;border-radius:6px;color:#05683a;text-align:center;">
         <?= htmlspecialchars($_SESSION['flash']); unset($_SESSION['flash']); ?>

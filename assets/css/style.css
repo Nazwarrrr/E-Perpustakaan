@@ -439,12 +439,15 @@
 	margin: 32px auto;
 	max-width: 1200px;
 	padding: 0 24px;
+	justify-items: center;
+	align-items: start;
 }
 .book-card {
 	background: #fff;
 	border-radius: 14px;
 	box-shadow: 0 6px 18px rgba(52,152,219,0.12);
 	padding: 26px 18px;
+	width: 100%;
 	max-width: 380px;
 	display: flex;
 	flex-direction: column;
@@ -602,7 +605,7 @@ body {
 .page-center {
 	max-width: 1200px;
 	margin: 0 auto;
-	padding: 0 16px;
+	padding: 90px 16px;
 }
 
 /* Top bar alignment */
