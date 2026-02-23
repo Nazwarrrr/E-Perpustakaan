@@ -23,7 +23,11 @@ CREATE TABLE buku (
     penerbit VARCHAR(100),
     stok INT,
     rak VARCHAR(20),
-    status VARCHAR(20)
+    status VARCHAR(20),
+    foto VARCHAR(255) NULL,
+    deskripsi TEXT NULL,
+    jumlah_halaman INT NULL,
+    tahun_terbit YEAR NULL
 );
 
 INSERT INTO buku (judul, penulis, penerbit, stok, rak, status) VALUES
@@ -41,13 +45,14 @@ CREATE TABLE peminjaman (
     tanggal_pinjam DATE,
     tanggal_kembali DATE,
     status VARCHAR(30),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_user) REFERENCES users(id),
+    FOREIGN KEY (id_buku) REFERENCES buku(id_buku)
 );
 
--- Tambahan: kolom baru untuk tabel `buku`
--- Jika Anda menjalankan dump ini pada database yang sudah ada, pastikan untuk menyesuaikan
--- (ALTER TABLE akan menambahkan kolom `deskripsi`, `jumlah_halaman`, dan `tahun_terbit` jika belum ada)
-ALTER TABLE `buku`
-    ADD COLUMN IF NOT EXISTS `deskripsi` TEXT NULL AFTER `foto`,
-    ADD COLUMN IF NOT EXISTS `jumlah_halaman` INT NULL AFTER `deskripsi`,
-    ADD COLUMN IF NOT EXISTS `tahun_terbit` YEAR NULL AFTER `penerbit`;
+-- Add Foreign Key constraints to riwayat table
+ALTER TABLE riwayat
+ADD CONSTRAINT fk_riwayat_user FOREIGN KEY (id_user) REFERENCES users(id),
+ADD CONSTRAINT fk_riwayat_buku FOREIGN KEY (id_buku) REFERENCES buku(id_buku);
+
+

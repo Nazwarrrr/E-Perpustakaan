@@ -74,7 +74,6 @@ $status = 'Aktif';
     <div class="profile-top-bar">
         <a href="test_buku.php" class="profile-back">Kembali</a>
     </div>
-    <div class="profile-container profile-large">
 </div>
 </body>
 </html>

@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stok = $d ? intval($d['stok']) : 0;
             if ($stok > 0) {
                 $stok_baru = $stok - 1;
-                $status_baru = ($stok_baru == 0) ? 'Habis' : 'Dipinjam';
+                $status_baru = ($stok_baru == 0) ? 'Habis' : 'Tersedia';
                 if (!mysqli_query($koneksi, "UPDATE buku SET status='$status_baru', stok='$stok_baru' WHERE id_buku='$id_buku'")) {
                     $error = 'Gagal memperbarui stok buku: ' . mysqli_error($koneksi);
                 } else {

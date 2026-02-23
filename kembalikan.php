@@ -6,7 +6,7 @@ if (!isset($_SESSION['login'])) {
 }
 include 'config/koneksi.php';
 
-$id = $_GET['id'];
+$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $query = mysqli_query($koneksi, "SELECT stok FROM buku WHERE id_buku='$id'");
 $data = mysqli_fetch_assoc($query);
 $stok = $data['stok'];
