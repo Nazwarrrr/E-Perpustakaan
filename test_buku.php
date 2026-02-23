@@ -167,8 +167,14 @@ while ($data = mysqli_fetch_assoc($res)) : ?>
 <script>
     // Beri tahu script client apakah user adalah admin (digunakan oleh live_books.js)
     window.IS_ADMIN = <?= (isset($_SESSION['role']) && $_SESSION['role'] == 'admin') ? 'true' : 'false' ?>;
+    // Hanya aktifkan live_books.js jika tidak ada filter pencarian
+    const hasFilter = !!(new URLSearchParams(window.location.search).get('keyword') || new URLSearchParams(window.location.search).get('status'));
+    if (!hasFilter) {
+        var script = document.createElement('script');
+        script.src = 'assets/js/live_books.js';
+        document.body.appendChild(script);
+    }
 </script>
-<script src="assets/js/live_books.js"></script>
 </div>
 </body>
 </html>
