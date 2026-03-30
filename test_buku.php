@@ -33,21 +33,25 @@ if (!empty($_GET['status'])) {
 </head>
 <body>
 
-<!-- Tombol kembali ke dashboard dihapus -->
+<!-- Navbar modern -->
+<header class="main-nav">
+    <div class="nav-brand">
+        <a href="test_buku.php">
+            <img src="assets/img/logo.png" alt="ePerpus Logo" class="list-logo-img brand-logo">
+        </a>
+    </div>
+    <nav class="nav-links">
+        <a href="test_buku.php">Daftar Buku</a>
+        <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>
+            <a href="admin_dashboard.php">Dashboard</a>
+            <a href="admin_peminjaman.php">Peminjaman</a>
+        <?php endif; ?>
+        <a href="profil.php">Profil</a>
+    </nav>
+</header>
 
-
-<div class="top-bar">
-    <a href="profil.php" class="top-profile">Profil</a>
-    <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin') : ?>
-        <a href="admin_dashboard.php" class="top-profile" style="margin-left:12px;">Dashboard</a>
-        <a href="admin_peminjaman.php" class="top-profile" style="margin-left:12px;">Peminjaman</a>
-    <?php endif; ?>
-</div>
-<div class="page-center">
-<div style="text-align:center;margin-bottom:12px;">
-    <img src="assets/img/logo.png" alt="Logo" class="list-logo-img" style="width:90px;height:90px;object-fit:contain;">
-</div>
-<h2 style="text-align:center;margin-bottom:16px;">Daftar Buku Perpustakaan</h2>
+<main class="page-center">
+    <h2>Daftar Buku Perpustakaan</h2>
 <?php if (!empty($_SESSION['flash'])): ?>
     <div style="max-width:900px;margin:12px auto;background:#e6ffed;border:1px solid #b8f3c7;padding:10px;border-radius:6px;color:#05683a;text-align:center;">
         <?= htmlspecialchars($_SESSION['flash']); unset($_SESSION['flash']); ?>
@@ -175,6 +179,6 @@ while ($data = mysqli_fetch_assoc($res)) : ?>
         document.body.appendChild(script);
     }
 </script>
-</div>
+</main>
 </body>
 </html>
